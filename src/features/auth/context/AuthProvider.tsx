@@ -1,6 +1,6 @@
-import { useState, type ReactNode } from "react";
-import type { User } from "../services/authService";
-import authService from "../services/authService";
+import { useState, useEffect, type ReactNode } from "react";
+import type { User } from "../types/auth.types";
+import authService from "../api/authService";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
@@ -8,10 +8,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     return authService.getCurrentUser();
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const currentUser = authService.getCurrentUser();
+      const token = authService.getToken();
+
+      if (currentUser && token) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, []);
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await authService.register(name, email, password);
+      const response = await authService.register({ name, email, password });
       setUser(response.user);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -25,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await authService.login(email, password);
+      const response = await authService.login({ email, password });
       setUser(response.user);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -42,6 +60,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
+  const updateUser = (updatedUser: Partial<User>) => {
+    if (user) {
+      const newUser = { ...user, ...updatedUser };
+      setUser(newUser);
+      localStorage.setItem("user", JSON.stringify(newUser));
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        }}
+      >
+        <div style={{ color: "white", fontSize: "20px" }}>Cargando...</div>
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -49,6 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
+        updateUser,
         isAuthenticated: !!user,
       }}
     >

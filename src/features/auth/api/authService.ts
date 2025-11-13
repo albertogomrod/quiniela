@@ -1,30 +1,16 @@
 import axios from "axios";
+import type {
+  User,
+  AuthResponse,
+  LoginCredentials,
+  RegisterData,
+} from "../types/auth.types";
 
 const API_URL = "http://localhost:5000/api/auth";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export interface AuthResponse {
-  message: string;
-  token: string;
-  user: User;
-}
-
 class AuthService {
-  async register(
-    name: string,
-    email: string,
-    password: string
-  ): Promise<AuthResponse> {
-    const response = await axios.post(`${API_URL}/register`, {
-      name,
-      email,
-      password,
-    });
+  async register(data: RegisterData): Promise<AuthResponse> {
+    const response = await axios.post(`${API_URL}/register`, data);
 
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
@@ -34,11 +20,8 @@ class AuthService {
     return response.data;
   }
 
-  async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await axios.post(`${API_URL}/login`, {
-      email,
-      password,
-    });
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await axios.post(`${API_URL}/login`, credentials);
 
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
@@ -55,12 +38,22 @@ class AuthService {
 
   getCurrentUser(): User | null {
     const userStr = localStorage.getItem("user");
-    if (userStr) return JSON.parse(userStr);
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return null;
+      }
+    }
     return null;
   }
 
   getToken(): string | null {
     return localStorage.getItem("token");
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken() && !!this.getCurrentUser();
   }
 }
 
