@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from "react";
 import type { User } from "../types/auth.types";
 import authService from "../api/authService";
+import userStatusService from "../api/userStatusService";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
@@ -30,7 +31,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (name: string, email: string, password: string) => {
     try {
       const response = await authService.register({ name, email, password });
-      setUser(response.user);
+
+      // Marcar como primera vez
+      const newUser = { ...response.user, isFirstTime: true };
+      setUser(newUser);
+      localStorage.setItem("user", JSON.stringify(newUser));
+
+      // La redirección se maneja en AuthRedirectGuard
+      return response;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(
@@ -45,6 +53,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await authService.login({ email, password });
       setUser(response.user);
+
+      // La redirección se maneja en AuthRedirectGuard
+      return response;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(
@@ -66,6 +77,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(newUser);
       localStorage.setItem("user", JSON.stringify(newUser));
     }
+  };
+
+  // Función para verificar el estado del usuario
+  const getUserStatus = () => {
+    return userStatusService.checkUserStatus(user);
   };
 
   if (loading) {
@@ -93,6 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         updateUser,
         isAuthenticated: !!user,
+        getUserStatus,
       }}
     >
       {children}

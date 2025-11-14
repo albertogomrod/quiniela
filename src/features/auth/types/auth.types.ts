@@ -4,6 +4,7 @@ export interface User {
   email: string;
   ligas?: string[];
   createdAt?: string;
+  isFirstTime?: boolean;
 }
 
 export interface AuthResponse {
@@ -21,4 +22,10 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
+}
+
+export interface UserOnboardingStatus {
+  hasLeagues: boolean;
+  isFirstTime: boolean;
+  shouldShowWelcome: boolean;
 }

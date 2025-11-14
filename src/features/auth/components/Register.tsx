@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../../../shared/styles/auth.css";
 import { useAuth } from "../hooks/useAuth";
 
@@ -14,7 +14,6 @@ export const Register = () => {
   const [loading, setLoading] = useState(false);
 
   const { register } = useAuth();
-  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -27,7 +26,6 @@ export const Register = () => {
     e.preventDefault();
     setError("");
 
-    // Validaciones
     if (
       !formData.name ||
       !formData.email ||
@@ -50,8 +48,14 @@ export const Register = () => {
 
     try {
       setLoading(true);
-      await register(formData.name, formData.email, formData.password);
-      navigate("/dashboard");
+      const response = await register(
+        formData.name,
+        formData.email,
+        formData.password
+      );
+
+      // El AuthRedirectGuard se encargará de la redirección
+      console.log("Registro exitoso:", response.user);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al registrarse");
     } finally {

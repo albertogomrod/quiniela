@@ -6,38 +6,59 @@ import {
   PublicRoute,
 } from "../../features/auth";
 import { DashboardLayout } from "../../features/dashboard";
+import { Home } from "../../pages/Home";
+import { Welcome } from "../../pages/Welcome";
+import { AuthRedirectGuard } from "../../features/auth/components/AuthRedirectGuard";
 
 export const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
+    <AuthRedirectGuard>
+      <Routes>
+        {/* Ruta pública - Home */}
+        <Route path="/" element={<Home />} />
 
-      <Route
-        path="/register"
-        element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        }
-      />
+        {/* Rutas de autenticación */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
 
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Ruta de bienvenida (primera vez) */}
+        <Route
+          path="/welcome"
+          element={
+            <ProtectedRoute>
+              <Welcome />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthRedirectGuard>
   );
 };

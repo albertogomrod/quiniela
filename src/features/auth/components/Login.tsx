@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import "../../../shared/styles/auth.css";
 
@@ -12,7 +12,6 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -32,8 +31,10 @@ export const Login = () => {
 
     try {
       setLoading(true);
-      await login(formData.email, formData.password);
-      navigate("/dashboard");
+      const response = await login(formData.email, formData.password);
+
+      // El AuthRedirectGuard se encargará de la redirección
+      console.log("Login exitoso:", response.user);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión");
     } finally {
