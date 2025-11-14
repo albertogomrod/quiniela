@@ -1,93 +1,196 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const authMiddleware = require("../middleware/auth");
+const authMiddleware = require("../middleware/authMiddleware");
 
-// Registro de usuario
+// POST /api/auth/register - Registro de usuario
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validaciones básicas
+    // Validaciones
     if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Por favor completa todos los campos" });
+      return res.status(400).json({
+        message: "Todos los campos son obligatorios",
+      });
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "La contraseña debe tener al menos 6 caracteres" });
+      return res.status(400).json({
+        message: "La contraseña debe tener al menos 6 caracteres",
+      });
     }
 
-    // Crear usuario
-    const user = await User.create({ name, email, password });
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "El email ya está registrado",
+      });
+    }
 
-    // Crear token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+    // Hash de la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Crear usuario
+    const user = new User({
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      isFirstTime: true,
+      ligas: [],
     });
+
+    await user.save();
+
+    // Generar token
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.status(201).json({
       message: "Usuario registrado exitosamente",
       token,
-      user: user.toJSON(),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isFirstTime: user.isFirstTime,
+        ligas: user.ligas,
+      },
     });
   } catch (error) {
     console.error("Error en registro:", error);
-    res.status(500).json({ message: error.message || "Error en el servidor" });
+    res.status(500).json({
+      message: "Error al registrar usuario",
+      error: error.message,
+    });
   }
 });
 
-// Login de usuario
+// POST /api/auth/login - Inicio de sesión
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Validaciones
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Por favor completa todos los campos" });
+      return res.status(400).json({
+        message: "Email y contraseña son obligatorios",
+      });
     }
 
     // Buscar usuario
-    const user = await User.findByEmail(email);
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(400).json({ message: "Credenciales inválidas" });
+      return res.status(401).json({
+        message: "Credenciales inválidas",
+      });
     }
 
     // Verificar contraseña
-    const isMatch = await User.comparePassword(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Credenciales inválidas" });
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        message: "Credenciales inválidas",
+      });
     }
 
-    // Crear token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // Generar token
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.json({
-      message: "Login exitoso",
+      message: "Inicio de sesión exitoso",
       token,
-      user: user.toJSON(),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isFirstTime: user.isFirstTime,
+        ligas: user.ligas,
+      },
     });
   } catch (error) {
     console.error("Error en login:", error);
-    res.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({
+      message: "Error al iniciar sesión",
+      error: error.message,
+    });
   }
 });
 
-// Obtener usuario actual (ruta protegida)
+// GET /api/auth/me - Obtener datos del usuario autenticado
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    const user = await User.findByEmail(req.userId);
-    res.json({ user: user.toJSON() });
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Usuario no encontrado",
+      });
+    }
+
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isFirstTime: user.isFirstTime,
+      ligas: user.ligas,
+      createdAt: user.createdAt,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error en el servidor" });
+    console.error("Error al obtener usuario:", error);
+    res.status(500).json({
+      message: "Error al obtener datos del usuario",
+      error: error.message,
+    });
+  }
+});
+
+// PUT /api/auth/update - Actualizar datos del usuario
+router.put("/update", authMiddleware, async (req, res) => {
+  try {
+    const { name, isFirstTime } = req.body;
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (isFirstTime !== undefined) updateData.isFirstTime = isFirstTime;
+
+    const user = await User.findByIdAndUpdate(req.user.id, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Usuario no encontrado",
+      });
+    }
+
+    res.json({
+      message: "Usuario actualizado exitosamente",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isFirstTime: user.isFirstTime,
+        ligas: user.ligas,
+      },
+    });
+  } catch (error) {
+    console.error("Error al actualizar usuario:", error);
+    res.status(500).json({
+      message: "Error al actualizar usuario",
+      error: error.message,
+    });
   }
 });
 

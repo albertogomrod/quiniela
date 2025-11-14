@@ -4,11 +4,12 @@ import {
   Register,
   ProtectedRoute,
   PublicRoute,
+  AuthRedirectGuard,
 } from "../../features/auth";
 import { DashboardLayout } from "../../features/dashboard";
+import { CreateLeagueWizard } from "../../features/league";
 import { Home } from "../../pages/Home";
 import { Welcome } from "../../pages/Welcome";
-import { AuthRedirectGuard } from "../../features/auth/components/AuthRedirectGuard";
 
 export const AppRoutes = () => {
   return (
@@ -55,6 +56,19 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Crear Liga */}
+        <Route
+          path="/dashboard/create-league"
+          element={
+            <ProtectedRoute>
+              <CreateLeagueWizard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* TODO: Rutas de liga individual */}
+        {/* <Route path="/league/:id" element={<ProtectedRoute><LeagueDetail /></ProtectedRoute>} /> */}
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />

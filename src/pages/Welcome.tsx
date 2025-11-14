@@ -10,7 +10,6 @@ export const Welcome = () => {
   >(null);
 
   const handleCreateLeague = () => {
-    // Marcar que ya no es primera vez
     if (user) {
       updateUser({ isFirstTime: false });
     }
@@ -19,7 +18,6 @@ export const Welcome = () => {
   };
 
   const handleJoinLeague = () => {
-    // Marcar que ya no es primera vez
     if (user) {
       updateUser({ isFirstTime: false });
     }
@@ -28,7 +26,6 @@ export const Welcome = () => {
   };
 
   const handleSkip = () => {
-    // Marcar que ya no es primera vez y ir al dashboard
     if (user) {
       updateUser({ isFirstTime: false });
     }
