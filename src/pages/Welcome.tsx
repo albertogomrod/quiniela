@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import "./Welcome.css";
 
 export const Welcome = () => {
   const { user, updateUser } = useAuth();
@@ -32,246 +33,119 @@ export const Welcome = () => {
     navigate("/dashboard");
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      action();
+    }
+  };
+
+  useEffect(() => {
+    // Anunciar página para screen readers
+    const announcement = document.createElement("div");
+    announcement.setAttribute("role", "status");
+    announcement.setAttribute("aria-live", "polite");
+    announcement.className = "sr-only";
+    announcement.textContent = `Bienvenido ${user?.name}. Elige entre crear una nueva liga o unirte a una existente.`;
+    document.body.appendChild(announcement);
+
+    return () => {
+      document.body.removeChild(announcement);
+    };
+  }, [user?.name]);
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        padding: "20px",
-      }}
-    >
+    <div className="welcome">
+      <a href="#main-content" className="welcome__skip-link">
+        Saltar al contenido principal
+      </a>
       {/* Header */}
-      <div
-        style={{
-          maxWidth: "1200px",
-          width: "100%",
-          margin: "0 auto",
-          padding: "20px 0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "32px" }}>🏆</span>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "24px",
-              fontWeight: "700",
-              color: "white",
-            }}
-          >
-            Quiniela
-          </h1>
+      <header className="welcome__header" role="banner">
+        <div className="welcome__logo">
+          <span className="welcome__logo-icon" role="img" aria-label="Trofeo">
+            🏆
+          </span>
+          <h1 className="welcome__logo-text">Quiniela</h1>
         </div>
         <button
           onClick={handleSkip}
-          style={{
-            padding: "10px 20px",
-            background: "rgba(255, 255, 255, 0.2)",
-            color: "white",
-            border: "1px solid rgba(255, 255, 255, 0.4)",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "14px",
-            backdropFilter: "blur(10px)",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
-          }}
+          className="welcome__skip-button"
+          aria-label="Saltar bienvenida e ir al dashboard"
         >
           Saltar →
         </button>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          maxWidth: "1200px",
-          width: "100%",
-          margin: "0 auto",
-          padding: "40px 0",
-        }}
-      >
+      <main id="main-content" className="welcome__main" role="main">
         {/* Welcome Message */}
-        <div
-          style={{
-            textAlign: "center",
-            marginBottom: "60px",
-            color: "white",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "48px",
-              fontWeight: "800",
-              marginBottom: "15px",
-              textShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
-            }}
-          >
-            ¡Bienvenido, {user?.name?.split(" ")[0]}! 🎉
+        <div className="welcome__message">
+          <h2 className="welcome__title">
+            ¡Bienvenido, {user?.name?.split(" ")[0]}!{" "}
+            <span role="img" aria-label="celebración">
+              🎉
+            </span>
           </h2>
-          <p
-            style={{
-              fontSize: "22px",
-              opacity: 0.95,
-              fontWeight: "400",
-              maxWidth: "600px",
-              margin: "0 auto",
-            }}
-          >
+          <p className="welcome__subtitle">
             Estás a un paso de comenzar tu aventura en la quiniela
           </p>
         </div>
 
         {/* Options Cards */}
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "30px",
-            width: "100%",
-            maxWidth: "900px",
-            marginBottom: "40px",
-          }}
+          className="welcome__options"
+          role="group"
+          aria-label="Opciones de inicio"
         >
           {/* Card: Crear Liga */}
-          <div
+          <article
+            className={`welcome__card ${
+              selectedOption === "create" ? "welcome__card--selected" : ""
+            }`}
             onClick={() => setSelectedOption("create")}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-8px)";
-              e.currentTarget.style.boxShadow =
-                "0 20px 60px rgba(0, 0, 0, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              if (selectedOption !== "create") {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 10px 40px rgba(0, 0, 0, 0.3)";
-              }
-            }}
-            style={{
-              background:
-                selectedOption === "create"
-                  ? "linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)"
-                  : "white",
-              borderRadius: "20px",
-              padding: "50px 40px",
-              textAlign: "center",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
-              border:
-                selectedOption === "create"
-                  ? "3px solid #667eea"
-                  : "3px solid transparent",
-              transform:
-                selectedOption === "create"
-                  ? "translateY(-8px)"
-                  : "translateY(0)",
-              position: "relative",
-              overflow: "hidden",
-            }}
+            onKeyPress={(e) =>
+              handleKeyPress(e, () => setSelectedOption("create"))
+            }
+            tabIndex={0}
+            role="button"
+            aria-pressed={selectedOption === "create"}
+            aria-label="Seleccionar crear nueva liga"
           >
             {/* Badge "Recomendado" */}
-            <div
-              style={{
-                position: "absolute",
-                top: "20px",
-                right: "20px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "white",
-                padding: "6px 12px",
-                borderRadius: "20px",
-                fontSize: "12px",
-                fontWeight: "700",
-                boxShadow: "0 4px 10px rgba(102, 126, 234, 0.4)",
-              }}
-            >
+            <div className="welcome__badge" aria-label="Opción recomendada">
               Recomendado
             </div>
 
-            <div style={{ fontSize: "80px", marginBottom: "20px" }}>🎯</div>
-            <h3
-              style={{
-                fontSize: "28px",
-                fontWeight: "800",
-                marginBottom: "15px",
-                color: "#333",
-              }}
+            <div
+              className="welcome__card-icon"
+              role="img"
+              aria-label="Objetivo"
             >
-              Crear Nueva Liga
-            </h3>
-            <p
-              style={{
-                color: "#666",
-                fontSize: "16px",
-                lineHeight: "1.6",
-                marginBottom: "30px",
-              }}
-            >
+              🎯
+            </div>
+            <h3 className="welcome__card-title">Crear Nueva Liga</h3>
+            <p className="welcome__card-description">
               Sé el administrador de tu propia liga privada. Configura las
               reglas e invita a tus amigos.
             </p>
 
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: "0 0 30px 0",
-                textAlign: "left",
-              }}
-            >
-              <li
-                style={{
-                  padding: "10px 0",
-                  color: "#333",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#28a745", fontSize: "18px" }}>✓</span>
+            <ul className="welcome__features">
+              <li className="welcome__feature">
+                <span className="welcome__feature-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Tú eres el administrador
               </li>
-              <li
-                style={{
-                  padding: "10px 0",
-                  color: "#333",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#28a745", fontSize: "18px" }}>✓</span>
+              <li className="welcome__feature">
+                <span className="welcome__feature-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Define tus propias reglas
               </li>
-              <li
-                style={{
-                  padding: "10px 0",
-                  color: "#333",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#28a745", fontSize: "18px" }}>✓</span>
+              <li className="welcome__feature">
+                <span className="welcome__feature-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Invita con código único
               </li>
             </ul>
@@ -281,133 +155,58 @@ export const Welcome = () => {
                 e.stopPropagation();
                 handleCreateLeague();
               }}
-              style={{
-                width: "100%",
-                padding: "16px 24px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "16px",
-                fontWeight: "700",
-                cursor: "pointer",
-                boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
+              className="welcome__card-button"
+              aria-label="Continuar para crear nueva liga"
             >
               Crear Liga →
             </button>
-          </div>
+          </article>
 
           {/* Card: Unirse a Liga */}
-          <div
+          <article
+            className={`welcome__card ${
+              selectedOption === "join"
+                ? "welcome__card--selected welcome__card--join"
+                : ""
+            }`}
             onClick={() => setSelectedOption("join")}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-8px)";
-              e.currentTarget.style.boxShadow =
-                "0 20px 60px rgba(0, 0, 0, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              if (selectedOption !== "join") {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 10px 40px rgba(0, 0, 0, 0.3)";
-              }
-            }}
-            style={{
-              background:
-                selectedOption === "join"
-                  ? "linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)"
-                  : "white",
-              borderRadius: "20px",
-              padding: "50px 40px",
-              textAlign: "center",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
-              border:
-                selectedOption === "join"
-                  ? "3px solid #28a745"
-                  : "3px solid transparent",
-              transform:
-                selectedOption === "join"
-                  ? "translateY(-8px)"
-                  : "translateY(0)",
-            }}
+            onKeyPress={(e) =>
+              handleKeyPress(e, () => setSelectedOption("join"))
+            }
+            tabIndex={0}
+            role="button"
+            aria-pressed={selectedOption === "join"}
+            aria-label="Seleccionar unirse a una liga"
           >
-            <div style={{ fontSize: "80px", marginBottom: "20px" }}>🤝</div>
-            <h3
-              style={{
-                fontSize: "28px",
-                fontWeight: "800",
-                marginBottom: "15px",
-                color: "#333",
-              }}
+            <div
+              className="welcome__card-icon"
+              role="img"
+              aria-label="Apretón de manos"
             >
-              Unirse a una Liga
-            </h3>
-            <p
-              style={{
-                color: "#666",
-                fontSize: "16px",
-                lineHeight: "1.6",
-                marginBottom: "30px",
-              }}
-            >
+              🤝
+            </div>
+            <h3 className="welcome__card-title">Unirse a una Liga</h3>
+            <p className="welcome__card-description">
               ¿Ya te invitaron a una liga? Únete con el código de invitación.
             </p>
 
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: "0 0 30px 0",
-                textAlign: "left",
-              }}
-            >
-              <li
-                style={{
-                  padding: "10px 0",
-                  color: "#333",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#28a745", fontSize: "18px" }}>✓</span>
+            <ul className="welcome__features">
+              <li className="welcome__feature">
+                <span className="welcome__feature-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Ingresa el código
               </li>
-              <li
-                style={{
-                  padding: "10px 0",
-                  color: "#333",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#28a745", fontSize: "18px" }}>✓</span>
+              <li className="welcome__feature">
+                <span className="welcome__feature-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Comienza inmediatamente
               </li>
-              <li
-                style={{
-                  padding: "10px 0",
-                  color: "#333",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#28a745", fontSize: "18px" }}>✓</span>
+              <li className="welcome__feature">
+                <span className="welcome__feature-icon" aria-hidden="true">
+                  ✓
+                </span>
                 Compite con amigos
               </li>
             </ul>
@@ -417,61 +216,33 @@ export const Welcome = () => {
                 e.stopPropagation();
                 handleJoinLeague();
               }}
-              style={{
-                width: "100%",
-                padding: "16px 24px",
-                background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "16px",
-                fontWeight: "700",
-                cursor: "pointer",
-                boxShadow: "0 4px 15px rgba(40, 167, 69, 0.4)",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
+              className="welcome__card-button welcome__card-button--join"
+              aria-label="Continuar para unirse a una liga"
             >
               Unirse →
             </button>
-          </div>
+          </article>
         </div>
 
         {/* Help Text */}
-        <p
-          style={{
-            color: "rgba(255, 255, 255, 0.8)",
-            fontSize: "14px",
-            textAlign: "center",
-            maxWidth: "600px",
-          }}
-        >
-          💡 No te preocupes, podrás crear o unirte a más ligas después desde tu
+        <p className="welcome__help">
+          <span className="welcome__help-icon" role="img" aria-label="Idea">
+            💡
+          </span>
+          No te preocupes, podrás crear o unirte a más ligas después desde tu
           dashboard
         </p>
-      </div>
+      </main>
 
       {/* Footer */}
-      <div
-        style={{
-          textAlign: "center",
-          padding: "20px 0",
-          color: "rgba(255, 255, 255, 0.7)",
-          fontSize: "13px",
-        }}
-      >
-        <p style={{ margin: 0 }}>
+      <footer className="welcome__footer" role="contentinfo">
+        <p className="welcome__footer-text">
           ¿Necesitas ayuda?{" "}
-          <a href="#" style={{ color: "white", textDecoration: "underline" }}>
+          <a href="#" className="welcome__footer-link">
             Contáctanos
           </a>
         </p>
-      </div>
+      </footer>
     </div>
   );
 };

@@ -1,0 +1,315 @@
+/* Dashboard Layout - Responsive Styles */
+
+.dashboard {
+  min-height: 100vh;
+  background: var(--neutral-100);
+}
+
+/* Header */
+.dashboard__header {
+  background: var(--neutral-50);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dashboard__header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 1.25rem) clamp(1rem, 4vw, 2.5rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dashboard__header-logo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dashboard__header-title {
+  margin: 0;
+  color: var(--neutral-900);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+}
+
+.dashboard__header-subtitle {
+  margin: 0;
+  color: var(--neutral-600);
+  font-size: clamp(0.813rem, 2vw, 0.875rem);
+}
+
+.dashboard__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.dashboard__user-info {
+  text-align: right;
+  display: none; /* Hidden on mobile */
+}
+
+.dashboard__user-name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--neutral-900);
+  font-size: var(--font-sm);
+}
+
+.dashboard__user-email {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--neutral-600);
+}
+
+/* Mobile Menu Button */
+.dashboard__menu-button {
+  display: none; /* Show only on mobile */
+  background: var(--neutral-50);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: var(--transition-base);
+}
+
+.dashboard__menu-button:hover {
+  background: var(--neutral-100);
+  border-color: var(--neutral-400);
+}
+
+.dashboard__menu-button:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+}
+
+.dashboard__hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 20px;
+}
+
+.dashboard__hamburger-line {
+  width: 100%;
+  height: 2px;
+  background: var(--neutral-900);
+  transition: var(--transition-base);
+}
+
+/* Mobile Menu Overlay */
+.dashboard__mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--neutral-50);
+  box-shadow: var(--shadow-2xl);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1050;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.dashboard__mobile-menu--open {
+  transform: translateX(0);
+}
+
+.dashboard__mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1040;
+}
+
+.dashboard__mobile-overlay--open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.dashboard__mobile-close {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: var(--space-2);
+  min-height: 44px;
+  min-width: 44px;
+  color: var(--neutral-700);
+}
+
+.dashboard__mobile-user {
+  padding: var(--space-4);
+  background: var(--neutral-100);
+  border-radius: var(--radius-lg);
+}
+
+/* Main Content */
+.dashboard__main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 1.25rem);
+}
+
+/* Welcome Banner */
+.dashboard__banner {
+  background: var(--gradient-hero);
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  border-radius: var(--radius-2xl);
+  color: var(--neutral-50);
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+  box-shadow: var(--shadow-primary);
+}
+
+.dashboard__banner-title {
+  margin: 0 0 var(--space-2) 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+}
+
+.dashboard__banner-subtitle {
+  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  opacity: 0.95;
+}
+
+/* Grid Layout */
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1rem, 3vw, 1.25rem);
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+}
+
+/* Section Title */
+.dashboard__section-title {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  color: var(--neutral-900);
+  margin-bottom: var(--space-5);
+}
+
+/* Empty State */
+.dashboard__empty {
+  text-align: center;
+  padding: clamp(3rem, 8vw, 5rem) var(--space-6);
+  background: var(--neutral-50);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard__empty-icon {
+  font-size: clamp(3rem, 8vw, 4rem);
+  margin-bottom: var(--space-6);
+  opacity: 0.5;
+}
+
+.dashboard__empty-title {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  color: var(--neutral-900);
+  margin-bottom: var(--space-3);
+}
+
+.dashboard__empty-description {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  color: var(--neutral-600);
+  margin-bottom: var(--space-6);
+  line-height: 1.6;
+}
+
+/* Responsive Breakpoints */
+@media (min-width: 768px) {
+  .dashboard__user-info {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .dashboard__menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dashboard__header-actions > button:not(.dashboard__menu-button) {
+    display: none; /* Hide logout button, move to mobile menu */
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard__header-title {
+    font-size: 1.125rem;
+  }
+
+  .dashboard__header-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .dashboard__banner {
+    padding: var(--space-6);
+  }
+
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (max-width: 375px) {
+  .dashboard__main {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .dashboard__mobile-menu {
+    width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard__mobile-menu,
+  .dashboard__mobile-overlay,
+  .dashboard__hamburger-line {
+    transition: none;
+  }
+}
+
+/* Body Scroll Lock */
+body:has(.dashboard__mobile-menu--open) {
+  overflow: hidden;
+}

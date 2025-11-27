@@ -1,4 +1,7 @@
-/* Reset y configuración global */
+/* Importar tokens primero */
+@import "../shared/styles/tokens.css";
+
+/* ==================== RESET Y CONFIGURACIÓN GLOBAL ==================== */
 * {
   margin: 0;
   padding: 0;
@@ -6,29 +9,37 @@
 }
 
 :root {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: var(--font-base);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
 
-  /* Variables de color */
-  --primary-color: #667eea;
-  --secondary-color: #764ba2;
-  --error-color: #dc3545;
-  --success-color: #28a745;
-  --text-dark: #333;
-  --text-light: #666;
-  --border-color: #e1e8ed;
-  --bg-light: #f5f7fa;
+  /* Mejorar renderizado de fuentes */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* Variables adicionales - compatibilidad con código legacy */
+  --primary-color: var(--primary-500);
+  --secondary-color: var(--secondary-500);
+  --error-color: var(--error-500);
+  --success-color: var(--success-500);
+  --text-dark: var(--text-primary);
+  --text-light: var(--text-secondary);
+  --border-color: var(--border-light);
+  --bg-light: var(--bg-secondary);
+}
+
+html {
+  /* Prevenir zoom en inputs en iOS */
+  font-size: 16px;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   font-family: inherit;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 }
 
 #root {
@@ -36,9 +47,316 @@ body {
   width: 100%;
 }
 
+/* ==================== ACCESIBILIDAD ==================== */
+
+/* Skip link para navegación por teclado */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--neutral-900);
+  color: white;
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  z-index: var(--z-tooltip);
+  border-radius: 0 0 var(--radius-sm) 0;
+  font-weight: var(--font-semibold);
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Focus visible mejorado - WCAG 2.1 */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Focus específico para botones */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* Reducir movimiento para usuarios con preferencias */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Modo oscuro - preparación */
+@media (prefers-color-scheme: dark) {
+  /* Se implementará en futuras iteraciones */
+}
+
+/* ==================== TIPOGRAFÍA RESPONSIVE ==================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.75rem); /* 32px - 60px */
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem); /* 24px - 36px */
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 1.875rem); /* 20px - 30px */
+}
+
+h4 {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem); /* 18px - 24px */
+}
+
+p {
+  line-height: var(--leading-relaxed);
+}
+
+/* ==================== UTILIDADES RESPONSIVE ==================== */
+
+/* Ocultar elementos según breakpoint */
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+/* Container responsivo */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: var(--container-sm);
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: var(--container-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: var(--container-lg);
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: var(--container-xl);
+  }
+}
+
+/* ==================== MEJORAS DE UX ==================== */
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selección de texto */
+::selection {
+  background-color: var(--primary-200);
+  color: var(--neutral-900);
+}
+
+::-moz-selection {
+  background-color: var(--primary-200);
+  color: var(--neutral-900);
+}
+
+/* Mejor legibilidad en inputs */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Touch targets mínimos 44x44px (WCAG 2.1 AAA) */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Evitar texto de placeholder muy claro (accesibilidad) */
+::placeholder {
+  color: var(--neutral-500);
+  opacity: 1;
+}
+
+/* ==================== SCROLLBAR PERSONALIZADA ==================== */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neutral-400);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--neutral-100);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-500);
+}
+
+/* ==================== PREVENIR PROBLEMAS COMUNES ==================== */
+
 /* Evitar scroll horizontal */
 html,
 body {
   overflow-x: hidden;
   width: 100%;
+}
+
+/* Imágenes responsive por defecto */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevenir overflow en pre/code */
+pre {
+  overflow-x: auto;
+}
+
+/* ==================== ANIMACIONES GLOBALES ==================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ==================== CLASES UTILITY ==================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

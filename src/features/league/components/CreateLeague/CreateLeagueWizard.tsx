@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { BasicInfo } from "./BasicInfo";
 import { Configuration } from "./Configuration";
@@ -18,6 +18,7 @@ export const CreateLeagueWizard = () => {
   const [error, setError] = useState("");
   const [createdLeague, setCreatedLeague] =
     useState<CreateLeagueResponse | null>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<CreateLeagueData>({
     name: "",
@@ -59,6 +60,18 @@ export const CreateLeagueWizard = () => {
   const handleBackToBasicInfo = () => {
     setCurrentView("basic");
   };
+
+  // Focus management when view changes
+  useEffect(() => {
+    if (mainContentRef.current) {
+      const firstInput = mainContentRef.current.querySelector<HTMLElement>(
+        'input, button, [tabindex="0"]'
+      );
+      if (firstInput) {
+        setTimeout(() => firstInput.focus(), 100);
+      }
+    }
+  }, [currentView]);
 
   const handleGoToLeague = () => {
     if (createdLeague) {
@@ -111,6 +124,8 @@ export const CreateLeagueWizard = () => {
             width: "90%",
             maxWidth: "600px",
           }}
+          role="navigation"
+          aria-label="Progreso de creación de liga"
         >
           <div
             style={{
@@ -118,6 +133,11 @@ export const CreateLeagueWizard = () => {
               justifyContent: "space-between",
               marginBottom: "10px",
             }}
+            role="progressbar"
+            aria-valuenow={progressStep}
+            aria-valuemin={1}
+            aria-valuemax={3}
+            aria-label={`Paso ${progressStep} de 3`}
           >
             {[1, 2, 3].map((stepNumber) => (
               <div
@@ -133,6 +153,9 @@ export const CreateLeagueWizard = () => {
                   borderRadius: "2px",
                   transition: "background 0.3s",
                 }}
+                aria-label={`Paso ${stepNumber} ${
+                  stepNumber <= progressStep ? "completo" : "pendiente"
+                }`}
               />
             ))}
           </div>
@@ -145,16 +168,38 @@ export const CreateLeagueWizard = () => {
               fontWeight: "600",
             }}
           >
-            <span>Información</span>
-            <span>Configuración</span>
-            <span>Código</span>
+            <span aria-current={progressStep === 1 ? "step" : undefined}>
+              Información
+            </span>
+            <span aria-current={progressStep === 2 ? "step" : undefined}>
+              Configuración
+            </span>
+            <span aria-current={progressStep === 3 ? "step" : undefined}>
+              Código
+            </span>
           </div>
         </div>
       )}
 
+      {/* Live Region for Screen Readers */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {currentView === "basic" &&
+          "Paso 1 de 3: Información básica de la liga"}
+        {currentView === "config" && "Paso 2 de 3: Configuración de la liga"}
+        {currentView === "invite" &&
+          "Paso 3 de 3: Código de invitación generado"}
+      </div>
+
       {/* Error Message */}
       {error && (
         <div
+          role="alert"
+          aria-live="assertive"
           style={{
             position: "fixed",
             top: "20px",
@@ -175,6 +220,9 @@ export const CreateLeagueWizard = () => {
       {/* Loading Overlay */}
       {loading && (
         <div
+          role="status"
+          aria-live="polite"
+          aria-label="Creando liga, por favor espere"
           style={{
             position: "fixed",
             inset: 0,
@@ -203,6 +251,7 @@ export const CreateLeagueWizard = () => {
                 animation: "spin 1s linear infinite",
                 margin: "0 auto 20px",
               }}
+              aria-hidden="true"
             />
             <p style={{ margin: 0, color: "#333", fontWeight: "600" }}>
               Creando tu liga...
@@ -212,36 +261,38 @@ export const CreateLeagueWizard = () => {
       )}
 
       {/* Views */}
-      {currentView === "basic" && (
-        <BasicInfo
-          initialData={{
-            name: formData.name,
-            description: formData.description || "",
-          }}
-          onNext={handleBasicInfoComplete}
-          onCancel={handleCancelCreation}
-        />
-      )}
+      <div ref={mainContentRef}>
+        {currentView === "basic" && (
+          <BasicInfo
+            initialData={{
+              name: formData.name,
+              description: formData.description || "",
+            }}
+            onNext={handleBasicInfoComplete}
+            onCancel={handleCancelCreation}
+          />
+        )}
 
-      {currentView === "config" && (
-        <Configuration
-          initialData={{
-            competition: formData.competition,
-            teamName: formData.teamName,
-            type: formData.type,
-          }}
-          onNext={handleConfigurationComplete}
-          onBack={handleBackToBasicInfo}
-        />
-      )}
+        {currentView === "config" && (
+          <Configuration
+            initialData={{
+              competition: formData.competition,
+              teamName: formData.teamName,
+              type: formData.type,
+            }}
+            onNext={handleConfigurationComplete}
+            onBack={handleBackToBasicInfo}
+          />
+        )}
 
-      {currentView === "invite" && createdLeague && (
-        <InviteCode
-          leagueData={createdLeague}
-          onFinish={handleGoToLeague}
-          onSkip={handleInviteLater}
-        />
-      )}
+        {currentView === "invite" && createdLeague && (
+          <InviteCode
+            leagueData={createdLeague}
+            onFinish={handleGoToLeague}
+            onSkip={handleInviteLater}
+          />
+        )}
+      </div>
 
       {/* CSS Animations */}
       <style>{`
