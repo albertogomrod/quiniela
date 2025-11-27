@@ -2,83 +2,104 @@ const express = require("express");
 const router = express.Router();
 const League = require("../models/League");
 const authMiddleware = require("../middleware/authMiddleware");
+const { body, validationResult } = require("express-validator");
 
 // Middleware de autenticación para todas las rutas
 router.use(authMiddleware);
 
 // POST /api/leagues - Crear nueva liga
-router.post("/", async (req, res) => {
-  try {
-    const { name, description, competition, teamName, type } = req.body;
-
-    if (!name || !competition || !teamName) {
+router.post(
+  "/",
+  [
+    body("name")
+      .trim()
+      .isLength({ min: 3, max: 50 })
+      .escape()
+      .matches(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/)
+      .withMessage("Nombre debe tener entre 3 y 50 caracteres alfanuméricos"),
+    body("description").optional().trim().isLength({ max: 200 }).escape(),
+    body("competition")
+      .isIn([
+        "premier-league",
+        "la-liga",
+        "serie-a",
+        "bundesliga",
+        "ligue-1",
+        "champions-league",
+      ])
+      .withMessage("Competición inválida"),
+    body("teamName")
+      .trim()
+      .isLength({ min: 2, max: 30 })
+      .escape()
+      .matches(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/)
+      .withMessage("Nombre del equipo inválido"),
+    body("type")
+      .isIn(["public", "private"])
+      .withMessage("Tipo de liga inválido"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
-        message:
-          "Nombre de liga, competición y nombre de equipo son obligatorios",
+        message: "Datos inválidos",
+        errors: errors.array(),
       });
     }
 
-    if (name.length < 3) {
-      return res.status(400).json({
-        message: "El nombre de la liga debe tener al menos 3 caracteres",
+    try {
+      const { name, description, competition, teamName, type } = req.body;
+
+      const inviteCode = await League.generateInviteCode();
+
+      const league = new League({
+        name,
+        description: description || "",
+        competition,
+        type: type || "private",
+        inviteCode,
+        adminId: req.user.id,
+        participants: [
+          {
+            userId: req.user.id,
+            teamName,
+            joinedAt: new Date(),
+            points: 0,
+          },
+        ],
       });
-    }
 
-    if (teamName.length < 2) {
-      return res.status(400).json({
-        message: "El nombre del equipo debe tener al menos 2 caracteres",
-      });
-    }
+      await league.save();
 
-    const inviteCode = await League.generateInviteCode();
+      const inviteLink = `${
+        process.env.FRONTEND_URL || "http://localhost:5173"
+      }/join/${inviteCode}`;
 
-    const league = new League({
-      name,
-      description: description || "",
-      competition,
-      type: type || "private",
-      inviteCode,
-      adminId: req.user.id,
-      participants: [
-        {
-          userId: req.user.id,
-          teamName,
-          joinedAt: new Date(),
-          points: 0,
+      res.status(201).json({
+        message: "Liga creada exitosamente",
+        league: {
+          id: league._id,
+          name: league.name,
+          description: league.description,
+          competition: league.competition,
+          type: league.type,
+          inviteCode: league.inviteCode,
+          adminId: league.adminId,
+          participants: league.participants.map((p) => p.userId.toString()),
+          createdAt: league.createdAt,
         },
-      ],
-    });
-
-    await league.save();
-
-    const inviteLink = `${
-      process.env.FRONTEND_URL || "http://localhost:5173"
-    }/join/${inviteCode}`;
-
-    res.status(201).json({
-      message: "Liga creada exitosamente",
-      league: {
-        id: league._id,
-        name: league.name,
-        description: league.description,
-        competition: league.competition,
-        type: league.type,
         inviteCode: league.inviteCode,
-        adminId: league.adminId,
-        participants: league.participants.map((p) => p.userId.toString()),
-        createdAt: league.createdAt,
-      },
-      inviteCode: league.inviteCode,
-      inviteLink,
-    });
-  } catch (error) {
-    console.error("Error al crear liga:", error);
-    res.status(500).json({
-      message: "Error al crear la liga",
-      error: error.message,
-    });
+        inviteLink,
+      });
+    } catch (error) {
+      console.error("Error al crear liga:", error);
+      res.status(500).json({
+        message: "Error al crear la liga",
+        error: error.message,
+      });
+    }
   }
-});
+);
 
 // GET /api/leagues/my-leagues - Obtener ligas del usuario
 router.get("/my-leagues", async (req, res) => {
