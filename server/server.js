@@ -23,7 +23,33 @@ mongoose
 
 // Rutas
 app.use("/api/auth", authRoutes);
-app.use("/api/leagues", leagueRoutes); // NUEVO
+app.use("/api/leagues", leagueRoutes);
+const rateLimit = require("express-rate-limit");
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { message: "Demasiados intentos, intenta de nuevo más tarde" },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message:
+        "Demasiados intentos de inicio de sesión. Intenta de nuevo en 15 minutos.",
+      retryAfter: req.rateLimit.resetTime,
+    });
+  },
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: { message: "Demasiados registros desde esta IP" },
+});
+
+// Aplicar limitadores
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", registerLimiter);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
