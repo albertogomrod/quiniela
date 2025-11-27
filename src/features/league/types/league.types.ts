@@ -6,7 +6,7 @@ export interface League {
   type: "public" | "private";
   inviteCode: string;
   adminId: string;
-  participants: string[];
+  participants?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +31,45 @@ export interface Competition {
   name: string;
   icon: string;
   season: string;
+}
+
+// Clasificación y estadísticas
+export interface LeagueStanding {
+  userId: string;
+  userName: string;
+  position: number;
+  points: number;
+  correctPredictions: number;
+  totalPredictions: number;
+  accuracy: number;
+}
+
+// Partidos y predicciones
+export interface Match {
+  id: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore?: number;
+  awayScore?: number;
+  date: string;
+  status: "scheduled" | "live" | "finished";
+  round: number;
+}
+
+export interface Prediction {
+  id: string;
+  userId: string;
+  matchId: string;
+  homeScore: number;
+  awayScore: number;
+  points?: number;
+  createdAt: string;
+}
+
+export interface CreatePredictionData {
+  matchId: string;
+  homeScore: number;
+  awayScore: number;
 }
 
 // Competiciones hardcodeadas

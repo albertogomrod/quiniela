@@ -1,0 +1,326 @@
+/* Join League Component Styles */
+
+.join-league {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-hero);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.join-league__card {
+  background: var(--neutral-50);
+  border-radius: var(--radius-2xl);
+  padding: clamp(2rem, 5vw, 3rem);
+  max-width: 600px;
+  width: 100%;
+  box-shadow: var(--shadow-2xl);
+  animation: fadeInUp 0.5s ease backwards;
+}
+
+/* Header */
+.join-league__header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.join-league__icon {
+  font-size: clamp(3rem, 8vw, 4rem);
+  margin-bottom: var(--space-4);
+  display: block;
+}
+
+.join-league__title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  color: var(--neutral-900);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.join-league__subtitle {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  color: var(--neutral-600);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Form */
+.join-league__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.join-league__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.join-league__label {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--neutral-900);
+}
+
+.join-league__label--required::after {
+  content: " *";
+  color: var(--accent-600);
+}
+
+.join-league__input {
+  padding: var(--space-4);
+  border: 2px solid var(--neutral-300);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-md);
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  font-weight: 600;
+  transition: var(--transition-base);
+}
+
+.join-league__input:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.join-league__input[aria-invalid="true"] {
+  border-color: var(--accent-600);
+}
+
+.join-league__input::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: inherit;
+  font-weight: 400;
+}
+
+/* Error Message */
+.join-league__error {
+  color: var(--accent-600);
+  font-size: var(--font-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--accent-50);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent-600);
+}
+
+.join-league__error-icon {
+  flex-shrink: 0;
+}
+
+/* Success Message */
+.join-league__success {
+  background: var(--accent-50);
+  border: 2px solid var(--accent-600);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  text-align: center;
+  animation: scaleIn 0.5s ease backwards;
+}
+
+.join-league__success-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+  display: block;
+}
+
+.join-league__success-title {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  color: var(--neutral-900);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.join-league__success-description {
+  font-size: var(--font-md);
+  color: var(--neutral-700);
+  line-height: 1.6;
+  margin: 0 0 var(--space-6) 0;
+}
+
+.join-league__league-info {
+  background: var(--neutral-50);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.join-league__league-name {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--neutral-900);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.join-league__league-competition {
+  font-size: var(--font-sm);
+  color: var(--neutral-600);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+/* Buttons */
+.join-league__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.join-league__button {
+  flex: 1;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-md);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-base);
+  border: none;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.join-league__button--primary {
+  background: var(--gradient-primary);
+  color: var(--neutral-50);
+  box-shadow: var(--shadow-primary);
+}
+
+.join-league__button--primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-primary-lg);
+}
+
+.join-league__button--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.join-league__button--primary:focus-visible {
+  outline: 3px solid var(--primary-800);
+  outline-offset: 2px;
+}
+
+.join-league__button--secondary {
+  background: var(--neutral-200);
+  color: var(--neutral-700);
+}
+
+.join-league__button--secondary:hover {
+  background: var(--neutral-300);
+}
+
+.join-league__button--secondary:focus-visible {
+  outline: 3px solid var(--neutral-600);
+  outline-offset: 2px;
+}
+
+/* Loading Spinner */
+.join-league__spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--neutral-50);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Help Text */
+.join-league__help {
+  text-align: center;
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--neutral-200);
+}
+
+.join-league__help-text {
+  font-size: var(--font-sm);
+  color: var(--neutral-600);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.join-league__help-link {
+  color: var(--primary-600);
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.join-league__help-link:hover {
+  color: var(--primary-700);
+}
+
+.join-league__help-link:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .join-league__card {
+    padding: var(--space-6);
+  }
+
+  .join-league__actions {
+    flex-direction: column;
+  }
+
+  .join-league__button {
+    width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .join-league__card,
+  .join-league__success,
+  .join-league__button--primary {
+    animation: none;
+    transition: none;
+  }
+
+  .join-league__button--primary:hover {
+    transform: none;
+  }
+
+  .join-league__spinner {
+    animation: none;
+    border-top-color: transparent;
+  }
+}

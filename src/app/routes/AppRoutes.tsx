@@ -7,7 +7,11 @@ import {
   AuthRedirectGuard,
 } from "../../features/auth";
 import { DashboardLayout } from "../../features/dashboard";
-import { CreateLeagueWizard } from "../../features/league";
+import {
+  CreateLeagueWizard,
+  JoinLeague,
+  LeaguePage,
+} from "../../features/league";
 import { Home } from "../../pages/Home";
 import { Welcome } from "../../pages/Welcome";
 
@@ -67,8 +71,25 @@ export const AppRoutes = () => {
           }
         />
 
-        {/* TODO: Rutas de liga individual */}
-        {/* <Route path="/league/:id" element={<ProtectedRoute><LeagueDetail /></ProtectedRoute>} /> */}
+        {/* Unirse a Liga */}
+        <Route
+          path="/dashboard/join-league"
+          element={
+            <ProtectedRoute>
+              <JoinLeague />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Página de Liga Individual */}
+        <Route
+          path="/league/:leagueId"
+          element={
+            <ProtectedRoute>
+              <LeaguePage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />
