@@ -4,8 +4,9 @@ import type {
   CreateLeagueResponse,
   League,
 } from "../types/league.types";
+import { config } from "../../../config/env";
 
-const API_URL = "http://localhost:5000/api/leagues";
+const API_URL = `${config.apiUrl}/api/leagues`;
 
 class LeagueService {
   async createLeague(data: CreateLeagueData): Promise<CreateLeagueResponse> {

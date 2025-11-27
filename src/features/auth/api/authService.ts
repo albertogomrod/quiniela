@@ -5,8 +5,9 @@ import type {
   LoginCredentials,
   RegisterData,
 } from "../types/auth.types";
+import { config } from "../../../config/env";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = `${config.apiUrl}/api/auth`;
 
 class AuthService {
   async register(data: RegisterData): Promise<AuthResponse> {
