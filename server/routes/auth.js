@@ -17,9 +17,24 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
-        message: "La contraseña debe tener al menos 6 caracteres",
+        message: "La contraseña debe tener al menos 8 caracteres",
+      });
+    }
+
+    if (password.length > 72) {
+      return res.status(400).json({
+        message: "La contraseña no puede exceder 72 caracteres",
+      });
+    }
+
+    // Validar complejidad
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "La contraseña debe contener al menos una mayúscula, una minúscula y un número",
       });
     }
 
