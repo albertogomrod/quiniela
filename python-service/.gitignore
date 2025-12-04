@@ -1,0 +1,24 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entorno virtual
+env/
+ENV/
+
+# Cache de soccerdata
+cache/
+*.log
+
+# Variables de entorno
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
